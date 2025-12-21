@@ -5,8 +5,9 @@ let
     pop = {
       __meta__ = option (
         struct "__meta__" {
+          __id__ = list any;
           name = string;
-          supers = list types.pop;
+          parents = list types.pop;
           defaults = attrs any;
           extension = function;
           precedenceList = list (attrs any);

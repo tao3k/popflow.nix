@@ -68,7 +68,7 @@ in
   };
 
   default = pop {
-    supers = [
+    parents = [
       self.recipesExtender
       self.argsExtender
       self.exporter

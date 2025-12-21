@@ -48,7 +48,7 @@ let
       exports = { };
       load = { };
     };
-    supers = [ ];
+    parents = [ ];
     extension = self: super: {
       setLoad =
         defun
@@ -88,7 +88,7 @@ let
   };
 
   default = pop {
-    supers = [
+    parents = [
       loadExtender
       exporter
     ];

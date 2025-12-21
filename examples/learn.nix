@@ -20,7 +20,7 @@ let
     defaults = {
       fExtenders = [ ];
     };
-    supers = [ A ];
+    parents = [ A ];
     extension = self: super: {
       d = super.a + super.c;
       inputs = l.fold (acc: ext: acc // ext) self.e self.fExtenders;

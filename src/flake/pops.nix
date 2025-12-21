@@ -76,7 +76,7 @@ in
   };
 
   default = pop {
-    supers = [
+    parents = [
       # Extend both pops and add apis for multiple extenders/exporters
       self.exporter
       self.inputsExtender
