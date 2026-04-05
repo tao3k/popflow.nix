@@ -1,17 +1,27 @@
-inputs':
+/*
+  Load the popflow library in two phases: first the base helpers under `__lib`,
+  then the higher-level modules under `src` with that composed lib in scope.
+
+  Type: AttrSet -> AttrSet
+*/
+inputs@{
+  haumea,
+  nixlib,
+  ...
+}:
 let
-  selfLib = inputs.haumea.lib.load {
+  selfLib = haumea.lib.load {
     src = ./__lib;
     inputs = {
-      lib = inputs.nixlib.lib;
+      lib = nixlib;
     };
   };
-  inputs = inputs' // {
-    lib = inputs.nixlib.lib // selfLib;
-  };
+  lib = nixlib // selfLib;
 in
 selfLib
-// inputs.haumea.lib.load {
+// haumea.lib.load {
   src = ./.;
-  inherit inputs;
+  inputs = inputs // {
+    inherit lib;
+  };
 }

@@ -1,28 +1,47 @@
 #pretty
 {
-  exampleFlake = {
-    packages = {
-      x86_64-darwin = {
-        firefox = <derivation firefox-112.0.2>;
-      };
-      x86_64-linux = {
-        firefox = <derivation firefox-112.0.2>;
-      };
-    };
+  initFlake = {
+    inputNames = [
+      "flake-compat"
+      "nixlib"
+    ];
+    outputNames = [
+      "inputs"
+    ];
   };
   inputs = {
-    flake-compat = {
-      lastModified = 1696426674;
-      lastModifiedDate = "20231004133754";
-      narHash = "sha256-kvjfFW7WAETZlt09AgDn1MrtKzP7t90Vf7vypd3OL1U=";
-      outPath = "/nix/store/8kpx53qi52yhjai1vdw8zpa95iqa61bv-source";
-      rev = "0f9255e01c2351cc7d116c072cb317785dd33b33";
-      shortRev = "0f9255e";
+    deSystemized = [
+      "custom"
+      "flake-compat"
+      "nixlib"
+      "nixpkgs"
+    ];
+    metadata = {
+      hasCustom = true;
+      hasNixlibFunc = true;
+      hasNixpkgs = true;
     };
-    nixlib = {
-      lib = {
-        func = <function>;
+    systemized = [
+      "custom"
+      "flake-compat"
+      "nixlib"
+      "nixpkgs"
+    ];
+  };
+  outputs = {
+    linux = {
+      metadata = {
+        hasCustom = true;
+        hasFunc = true;
       };
+      packageName = "hello";
+      packageSystems = [
+        "x86_64-linux"
+      ];
     };
+    mergedSystems = [
+      "x86_64-darwin"
+      "x86_64-linux"
+    ];
   };
 }

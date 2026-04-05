@@ -1,0 +1,13 @@
+{"v":"1.0.0"
+,"i":{
+"nixpkgs":{"kd":[1,{"ft":1,"ur":"https://github.com/NixOS/nixpkgs/archive/6201e203d09599479a3b3450ed24fa81537ebc4e.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-ZojAnPuCdy657PbTq5V0Y+AHKhZAIwSIT2cb8UgAz/U="},"fv":"6201e203d09599479a3b3450ed24fa81537ebc4e","ps":[]}
+,"POP":{"kd":[1,{"ft":1,"ur":"https://github.com/divnix/POP/archive/b6b81b1c42ba78fda5b3021f8927cf2a52b5460e.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-AZIHeUaHsjn31LdYI34MZwU/WqANNyBqJr65zGdLqlc="},"fv":"b6b81b1c42ba78fda5b3021f8927cf2a52b5460e","ps":[]}
+,"call-flake":{"kd":[1,{"ft":1,"ur":"https://github.com/divnix/call-flake/archive/1abb37095a152e0e8ba4315c57c84905bc8bf93c.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-11/dQG/vjpfMi4D7ku2o1UtUMf8Sud0KJ/Le44zHIc8="},"fv":"1abb37095a152e0e8ba4315c57c84905bc8bf93c","ps":[]}
+,"dmerge":{"kd":[1,{"ft":1,"ur":"https://github.com/divnix/dmerge/archive/7e528814b0da207ea12ab3f62f2a928b7b8fe9c6.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-SFrpyBVYaBVu4kaEm6O9O5P+ZKASMEa2EOQSlC33/Ok="},"fv":"7e528814b0da207ea12ab3f62f2a928b7b8fe9c6","ps":[]}
+,"haumea":{"kd":[1,{"ft":1,"ur":"https://github.com/nix-community/haumea/archive/c9bf22f79ba1250c31d2c79232669b0280200cc6.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-PipZGd4lzEm64M3T0OOYbej+KgXEjmyIT+SPbswqAiA="},"fv":"c9bf22f79ba1250c31d2c79232669b0280200cc6","ps":[]}
+,"namaka":{"kd":[1,{"ft":1,"ur":"https://github.com/nix-community/namaka/archive/7f1fe86fcdbc0cb3b08d60822199bd76ce57494a.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-7oYQISAF0Ds8EZM8kR/tmoBhxCl6NGRXQarAWscJxEo="},"fv":"7f1fe86fcdbc0cb3b08d60822199bd76ce57494a","ps":[]}
+,"nixlib":{"kd":[1,{"ft":1,"ur":"https://github.com/nix-community/nixpkgs.lib/archive/333c4e0545a6da976206c74db8773a1645b5870a.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-+U7gF3qxzwD5TZuANzZPeJTZRHS29OFQgkQ2kiTJBIQ="},"fv":"333c4e0545a6da976206c74db8773a1645b5870a","ps":[]}
+,"yants":{"kd":[1,{"ft":1,"ur":"https://github.com/divnix/yants/archive/cde27c2821d925245303650c2914d4b7d3a435cd.tar.gz","ms":[]}],"ha":{"al":0,"vl":"sha256-ILTqQyhVsouZDfbhEVFJI6b3NDZIQQRluL2dk3bee+Y="},"fv":"cde27c2821d925245303650c2914d4b7d3a435cd","ps":[]}
+}
+,"p":{}
+}

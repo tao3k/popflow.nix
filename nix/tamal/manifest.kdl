@@ -1,0 +1,79 @@
+// ┏┓╻+╻ ╱┏┳┓┏┓┏┳┓┏┓╻
+// ┃┃┃┃┗━┓╹┃╹┣┫┃┃┃┣┫┃   Read the manpage:
+// ╹┗┛╹╱ ╹ ╹ ╹╹╹ ╹╹╹┗┛  $ man nixtamal-manifest
+version "1.0.0"
+default-fetch-time "eval"
+inputs {
+	nixpkgs {
+		archive {
+			url "https://github.com/NixOS/nixpkgs/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/NixOS/nixpkgs.git" --refs "refs/heads/nixos-unstable"
+			| cut -f1
+		}
+	}
+	nixlib {
+		archive {
+			url "https://github.com/nix-community/nixpkgs.lib/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/nix-community/nixpkgs.lib.git" HEAD
+			| cut -f1
+		}
+	}
+	POP {
+		archive {
+			url "https://github.com/divnix/POP/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/divnix/POP.git" HEAD
+			| cut -f1
+		}
+	}
+	yants {
+		archive {
+			url "https://github.com/divnix/yants/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/divnix/yants.git" --refs "refs/pull/5/head"
+			| cut -f1
+		}
+	}
+	haumea {
+		archive {
+			url "https://github.com/nix-community/haumea/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/nix-community/haumea.git" HEAD
+			| cut -f1
+		}
+	}
+	dmerge {
+		archive {
+			url "https://github.com/divnix/dmerge/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/divnix/dmerge.git" HEAD
+			| cut -f1
+		}
+	}
+	call-flake {
+		archive {
+			url "https://github.com/divnix/call-flake/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/divnix/call-flake.git" HEAD
+			| cut -f1
+		}
+	}
+	namaka {
+		archive {
+			url "https://github.com/nix-community/namaka/archive/{{fresh_value}}.tar.gz"
+		}
+		fresh-cmd {
+			$ git ls-remote "https://github.com/nix-community/namaka.git" HEAD
+			| cut -f1
+		}
+	}
+}

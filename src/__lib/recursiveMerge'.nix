@@ -1,25 +1,42 @@
 { lib, ... }:
-
 with lib;
 
 let
+  reverseConcatLists = values: concatLists (reverseList values);
+
+  mergeAttrs = zipAttrsWith (
+    _: values:
+    if tail values == [ ] then
+      head values
+    else if all isList values then
+      unique (reverseConcatLists values)
+    else if all isAttrs values then
+      mergeAttrs values
+    else
+      last values
+  );
+
+  /*
+    Variant of `recursiveMerge` that still merges nested attrsets recursively,
+    but concatenates lists in reverse precedence so later list fragments come
+    first.
+
+    Type: [AttrSet] -> AttrSet
+
+    Example:
+      recursiveMerge' [
+        { packages = [ "hello" ]; }
+        { packages = [ "git" ]; }
+      ]
+      => { packages = [ "git" "hello" ]; }
+  */
   recursiveMerge =
     attrList:
-    let
-      f =
-        attrPath:
-        zipAttrsWith (
-          n: values:
-          if tail values == [ ] then
-            head values
-          else if all isList values then
-            unique (foldr (acc: val: val ++ acc) [ ] values) # Reverse the order of concatenation
-          else if all isAttrs values then
-            f (attrPath ++ [ n ]) values
-          else
-            last values
-        );
-    in
-    f [ ] attrList;
+    if attrList == [ ] then
+      { }
+    else if tail attrList == [ ] then
+      head attrList
+    else
+      mergeAttrs attrList;
 in
 recursiveMerge

@@ -1,15 +1,37 @@
 #pretty
 {
-  home-manager = {
-    success = true;
-    value = {
-      modules = [ ];
+  args = {
+    profiles = {
+      primary = "guangtao";
+    };
+    systems = {
+      default = "x86_64-linux";
     };
   };
-  nixos = {
-    success = true;
-    value = {
-      modules = [ ];
+  exports = {
+    summary = {
+      hasHomeManager = true;
+      nixosHasModules = false;
+      nixosIsServer = true;
+      profile = "guangtao";
+      recipeKinds = [
+        "home-manager"
+        "nixos"
+      ];
+      system = "x86_64-linux";
+    };
+  };
+  recipes = {
+    home-manager = {
+      modules = [
+        "shell"
+        "git"
+      ];
+    };
+    nixos = {
+      roles = {
+        server = true;
+      };
     };
   };
 }

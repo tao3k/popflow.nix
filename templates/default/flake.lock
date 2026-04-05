@@ -5,7 +5,7 @@
         "flake-compat": "flake-compat",
         "nixlib": "nixlib",
         "nixpkgs": [
-          "flops"
+          "popflow"
         ]
       },
       "locked": {
@@ -40,15 +40,15 @@
     "dmerge": {
       "inputs": {
         "haumea": [
-          "flops",
+          "popflow",
           "haumea"
         ],
         "nixlib": [
-          "flops",
+          "popflow",
           "nixlib"
         ],
         "yants": [
-          "flops",
+          "popflow",
           "yants"
         ]
       },
@@ -82,7 +82,7 @@
         "type": "github"
       }
     },
-    "flops": {
+    "popflow": {
       "inputs": {
         "POP": "POP",
         "call-flake": "call-flake",
@@ -94,21 +94,21 @@
       "locked": {
         "lastModified": 1694677377,
         "narHash": "sha256-oT6S09hN+6elGlWX0d7euzhplCfveCUtFr4QsmHDeus=",
-        "owner": "gtrunsec",
-        "repo": "flops",
+        "owner": "tao3k",
+        "repo": "popflow.nix",
         "rev": "b31402c55ea03e135edb45b5af127864c29a573c",
         "type": "github"
       },
       "original": {
-        "owner": "gtrunsec",
-        "repo": "flops",
+        "owner": "tao3k",
+        "repo": "popflow.nix",
         "type": "github"
       }
     },
     "haumea": {
       "inputs": {
         "nixpkgs": [
-          "flops",
+          "popflow",
           "nixlib"
         ]
       },
@@ -225,7 +225,7 @@
     },
     "root": {
       "inputs": {
-        "flops": "flops",
+        "popflow": "popflow",
         "haumea": "haumea_2",
         "nixlib": "nixlib_3",
         "nixpkgs": "nixpkgs_2"

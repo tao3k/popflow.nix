@@ -2,24 +2,43 @@
 let
   l = lib // builtins;
   /*
-    A helper function which hides the complexities of dealing
-    with 'system' properly from you, while still providing
-    escape hatches when dealing with cross-compilation.
+    Collapse system-scoped attribute sets into the surrounding attrset for up to
+    three levels, so callers can work with `packages.<system>` style outputs as
+    plain attrs.
 
-    You can use this function independently of the rest of std.
+    Type: String -> AttrSet -> AttrSet
+
+    Example:
+      deSystemize "x86_64-linux" {
+        packages = {
+          x86_64-linux = { hello = "drv"; };
+        };
+      }
+      => {
+        packages = {
+          x86_64-linux = { hello = "drv"; };
+          hello = "drv";
+        };
+      }
   */
   deSystemize =
     let
       iteration =
         cutoff: system: fragment:
-        if !(l.isAttrs fragment) || cutoff == 0 then
+        if cutoff == 0 || !(l.isAttrs fragment) then
           fragment
-        else if l.hasAttr "${system}" fragment && !l.isFunction fragment.${system} then
-          fragment // fragment.${system}
-        else if l.hasAttr "${system}" fragment && l.isFunction fragment.${system} then
-          fragment // { __functor = _: fragment.${system}; }
         else
-          l.mapAttrs (_: iteration (cutoff - 1) system) fragment;
+          let
+            systemKey = "${system}";
+            hasSystemFragment = l.hasAttr systemKey fragment;
+            systemFragment = fragment.${systemKey};
+          in
+          if !hasSystemFragment then
+            l.mapAttrs (_: iteration (cutoff - 1) system) fragment
+          else if l.isFunction systemFragment then
+            fragment // { __functor = _: systemFragment; }
+          else
+            fragment // systemFragment;
     in
     iteration 3;
 in

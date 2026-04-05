@@ -1,16 +1,19 @@
 { lib }:
-# map each attribute in the given set into
-# a list of attributes and subsequently merge them into
-# a new attribute set with the specified mergeFun.
-# Type: ({ ... } -> { ... } -> { ... }) -> (String -> a -> { ... }) -> { ... } -> { ... }
-# Example:
-#   concatMapAttrsWith (mergeAttrsButConcatOn "mykey")
-#     (name: value: {
-#       ${name} = value;
-#       ${key} = value ++ value;
-#     })
-#     { x = "a"; y = "b"; }
-#   => { x = "a"; y = "b"; mykey = [ "aa" "bb"]; }
+/*
+  Map each attribute in the input set into a new attribute set and then merge
+  all mapped results with the provided merge function.
+
+  Type: (AttrSet -> AttrSet -> AttrSet) -> (String -> a -> AttrSet) -> AttrSet -> AttrSet
+
+  Example:
+    concatMapAttrsWith (mergeAttrsButConcatOn "mykey")
+      (name: value: {
+        ${name} = value;
+        mykey = [ value value ];
+      })
+      { x = "a"; y = "b"; }
+    => { x = "a"; y = "b"; mykey = [ "a" "a" "b" "b" ]; }
+*/
 let
   inherit (builtins) attrValues foldl' mapAttrs;
   inherit (lib) flip pipe;

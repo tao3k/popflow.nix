@@ -1,0 +1,53 @@
+#pretty
+{
+  constructors = {
+    extendPop = {
+      kind = "behavioral";
+      meta = "extendPop";
+      mirroredBaseValue = 6;
+    };
+    kPop = {
+      enabled = true;
+      label = "constant-leaf";
+      meta = "kPop";
+    };
+    kxPop = {
+      kind = "constant";
+      leafLabel = "constant-leaf";
+      leafMeta = "kPop";
+      meta = "kxPop";
+    };
+    pop = {
+      baseValue = 6;
+      derivedValue = 7;
+      meta = "pop";
+    };
+  };
+  grafonnixTemplateStyle = {
+    behaviorObject = {
+      current = "15m";
+      meta = "pop";
+      name = "resolution";
+      optionCount = 3;
+      type = "interval";
+    };
+    patchedValueObject = {
+      current = "prod";
+      hide = "label";
+      meta = "kxPop";
+    };
+    valueObject = {
+      includeAll = true;
+      meta = "kPop";
+      name = "environment";
+      type = "query";
+    };
+  };
+  takeaways = {
+    extendPop = "Use when you need one more behavioral POP step.";
+    kPop = "Use for lightweight constant-like POP objects.";
+    kxPop = "Use when you only need a constant patch over an existing POP object.";
+    pop = "Use for rich POP objects with defaults, parents, and behavior.";
+    templateNix = "Grafonnix template.nix is a good reading guide: value-like template objects lean on kPop, richer template variants use pop, and constant follow-up changes should prefer kxPop.";
+  };
+}

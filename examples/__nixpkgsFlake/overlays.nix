@@ -1,6 +1,6 @@
 inputs:
 let
-  inherit (inputs.POP.lib) kxPop extendPop;
+  inherit (inputs.POP) kxPop extendPop;
 in
 pkgs: _: {
   helloPop = extendPop pkgs.hello (
@@ -9,9 +9,7 @@ pkgs: _: {
 
       attrs = extendPop super.drvAttrs (
         _: superAttrs: {
-          src = extendPop superAttrs.src (
-            params: superGL: { propagatedBuildInputs = [ pkgs.wget ]; }
-          );
+          src = kxPop superAttrs.src { propagatedBuildInputs = [ pkgs.wget ]; };
         }
       );
     }

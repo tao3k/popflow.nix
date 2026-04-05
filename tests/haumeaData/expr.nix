@@ -1,34 +1,47 @@
-{ inputs, lib }:
-with inputs.haumea.lib;
-let
-  inherit (inputs) POP dmerge;
-  inherit (POP.lib) extendPop;
-  inherit (lib.haumea) pops;
+/*
+  Exercise the plain Haumea data-loading path. This test checks that the
+  Haumea POP load object, load extenders, scoped loaders, exporter-added
+  outputs, and `dmerge`-based output overrides all evaluate successfully.
 
-  a = pops.default.setInit {
+  Type: AttrSet -> AttrSet
+*/
+_:
+let
+  popflowInputs = import ../..;
+in
+with popflowInputs.haumea.lib;
+let
+  inherit (popflowInputs) POP dmerge;
+  inherit (POP) extendPop kxPop;
+  popflowLib = import ../../src/__loader.nix popflowInputs;
+  inherit (popflowLib.haumea) pops;
+
+  # Start from the default Haumea POP object and opt into lifted default.nix data files.
+  baseDataLoad = pops.default.withInitLoad {
     transformer = [ transformers.liftDefault ];
     inputs = {
-      lib = inputs.nixlib.lib;
+      lib = popflowInputs.nixlib;
     };
   };
 
-  b = a.addLoadExtender {
+  # Thread extra inputs into the load so exporters can use dmerge-aware helpers.
+  dataLoadWithDmerge = baseDataLoad.addLoadExtender {
     load = {
       inputs = {
-        dmerge = inputs.dmerge;
+        dmerge = popflowInputs.dmerge;
       };
     };
   };
 
-  data =
-    ((b.addLoadExtender { load.src = ./__data; }).addLoadExtender (
-      extendPop pops.loadExtender (
-        self: super: { load.loader = [ (matchers.nix loaders.scoped) ]; }
-      )
+  # Load the fixture tree and expose one custom export built through `outputs`.
+  dataFixtureLoad =
+    ((dataLoadWithDmerge.addLoadExtender { load.src = ./__data; }).addLoadExtender (
+      # This extender is a pure constant patch, so `kxPop` is the lighter POP fit.
+      kxPop pops.load { load.loader = [ (matchers.nix loaders.scoped) ]; }
     )).addExporters
       [
         (extendPop pops.exporter (
-          self: super: {
+          self: _: {
             exports.customData =
               with dmerge;
               self.outputs {
@@ -41,14 +54,18 @@ let
 
   inherit (builtins) deepSeq mapAttrs tryEval;
 in
+/*
+  Evaluate both the raw outputs and the custom exporter outputs so Namaka can
+  snapshot their final shapes.
+*/
 mapAttrs (_: x: tryEval (deepSeq x x)) {
   outputs = {
-    default = data.outputs { };
-    dmergeWithOutputs = data.outputs {
+    default = dataFixtureLoad.outputs { };
+    dmergeWithOutputs = dataFixtureLoad.outputs {
       treefmt.formatter.nix.command = "nixfmt";
       treefmt.formatter.prettier.includes = with dmerge; append [ "*.dmergeOutputs" ];
     };
-    funWithOutputs = data.outputs (
+    funWithOutputs = dataFixtureLoad.outputs (
       x:
       x
       // {
@@ -58,5 +75,5 @@ mapAttrs (_: x: tryEval (deepSeq x x)) {
       }
     );
   };
-  exports = data.exports;
+  exports = dataFixtureLoad.exports;
 }

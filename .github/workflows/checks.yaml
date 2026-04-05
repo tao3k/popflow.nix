@@ -8,7 +8,7 @@ jobs:
   nix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -18,8 +18,5 @@ jobs:
       - name: Run Flake Show
         run: nix -Lv flake show --override-input namaka github:nix-community/namaka
 
-      - name: Run Eval check
-        run: nix -Lv eval ./local#checks --override-input namaka github:nix-community/namaka --refresh
-
-      - name: Run Format Check
-        run: nix develop ./local --command treefmt -- . --fail-on-change --no-cache
+      - name: Run Flake Check
+        run: nix -Lv flake check --override-input namaka github:nix-community/namaka --refresh

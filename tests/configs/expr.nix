@@ -1,30 +1,62 @@
-{ configs, inputs }:
+/*
+  Exercise the configs POP workflow as an object semantic test. This verifies
+  recipe merging, args folding, and exporter-visible final state.
+
+  Type: AttrSet -> AttrSet
+*/
+_:
 let
-  inherit (inputs) POP dmerge;
-  default =
+  popflowInputs = import ../..;
+  inherit (popflowInputs) POP;
+  popflowLib = import ../../src/__loader.nix popflowInputs;
+  pops = popflowLib.configs.pops;
+
+  workflow =
+    let
+      seed = pops.default.withInitRecipes {
+        nixos.modules = [ "core" ];
+      };
+    in
     (
-      (configs.pops.default.setInitRecipes {
-        nixos = {
-          modules = [ ];
-        };
-      }).addRecipesExtender
-      {
-        home-manager = {
-          modules = [ ];
-        };
-      }
-    ).addExporters
-      [
-        (inputs.POP.lib.extendPop configs.pops.exporter (
-          self: super: {
-            exports.home-manager = self.recipes.home-manager;
-            exports.nixos = self.recipes.nixos;
+      (
+        (seed.addRecipesExtenders [
+          {
+            nixos.roles.server = true;
           }
-        ))
-      ];
-  inherit (builtins) deepSeq mapAttrs tryEval;
+          {
+            home-manager.modules = [
+              "shell"
+              "git"
+            ];
+          }
+        ]).addArgsExtenders
+        [
+          {
+            systems.default = "x86_64-linux";
+          }
+          {
+            profiles.primary = "guangtao";
+          }
+        ]
+      ).addExporter
+      (
+        POP.extendPop pops.exporter (
+          self: _: {
+            exports.summary = {
+              recipeKinds = builtins.attrNames self.recipes;
+              system = self.args.systems.default;
+              profile = self.args.profiles.primary;
+              hasHomeManager = self.recipes ? home-manager;
+              nixosIsServer = self.recipes.nixos.roles.server;
+              nixosHasModules = self.recipes.nixos ? modules;
+            };
+          }
+        )
+      )
+    );
 in
-mapAttrs (_: x: tryEval (deepSeq x x)) {
-  home-manager = default.exports.home-manager;
-  nixos = default.exports.nixos;
+{
+  recipes = workflow.recipes;
+  args = workflow.args;
+  exports = workflow.exports;
 }

@@ -1,0 +1,38 @@
+#pretty
+{
+  contracts = {
+    configs = {
+      defaultPopAcceptsDefaultObject = true;
+      exporterPopAcceptsExporterObject = true;
+    };
+    flake = {
+      defaultPopAcceptsDefaultObject = true;
+      invalidInputsPatchRejected = true;
+      validatedInputsPatch = {
+        inputs = {
+          demo = {
+            flag = true;
+          };
+        };
+      };
+    };
+    haumea = {
+      defaultPopAcceptsDefaultObject = true;
+      invalidLoadExtenderRejected = true;
+      loadExtenderAcceptsStructuredPatch = true;
+    };
+  };
+  methods = {
+    configs = {
+      note = "Configs contract names are in place, but richer runtime method typing is still deferred because naive defun retrofits disturbed polymorphic POP chaining.";
+    };
+    flake = {
+      addInputsExtenderAcceptsPatch = true;
+      addInputsExtenderRejectsWrongShape = true;
+    };
+    haumea = {
+      addLoadExtenderAcceptsStructuredPatch = true;
+      addLoadExtenderRejectsInvalidType = true;
+    };
+  };
+}

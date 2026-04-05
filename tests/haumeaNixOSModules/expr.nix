@@ -1,48 +1,60 @@
-{ inputs, lib }:
-let
-  inherit (inputs) POP dmerge;
-  inherit (POP.lib) extendPop;
-  inherit (lib.haumea) pops;
+/*
+  Exercise the NixOS-module flavored Haumea loader. This verifies that module
+  imports, load extenders, and exported outputs all work when the load type is
+  `nixosModules`.
 
-  A =
-    with inputs.haumea.lib;
-    pops.default.setInit {
+  Type: AttrSet -> AttrSet
+*/
+_:
+let
+  popflowInputs = import ../..;
+  inherit (popflowInputs) POP dmerge;
+  inherit (POP) kxPop;
+  popflowLib = import ../../src/__loader.nix popflowInputs;
+  inherit (popflowLib.haumea) pops;
+
+  # Start from the repository root with the lib expected by the module importer.
+  baseModuleLoad =
+    with popflowInputs.haumea.lib;
+    pops.default.withInitLoad {
       src = ../..;
       inputs = {
-        inherit lib;
+        lib = popflowLib;
       };
       type = "nixosModules";
     };
 
-  B =
-    with inputs.haumea.lib;
-    A.addLoadExtender {
+  # Add dmerge so fixture modules can build module-level overrides.
+  moduleLoadWithDmerge =
+    with popflowInputs.haumea.lib;
+    baseModuleLoad.addLoadExtender {
       load.inputs = {
-        inherit (inputs) dmerge;
+        inherit (popflowInputs) dmerge;
       };
     };
 
+  # Narrow the load to the fixture tree and provide POP for nested module extenders.
   nixosModules =
-    with inputs.haumea.lib;
+    with popflowInputs.haumea.lib;
     (
-      (B.addLoadExtender {
+      (moduleLoadWithDmerge.addLoadExtender {
         load = {
           src = ../evalModules/__fixture;
           type = "nixosModules";
         };
       }).addLoadExtender
       (
-        extendPop pops.loadExtender (
-          self: super: {
-            load.inputs = {
-              POP = inputs.POP;
-            };
-          }
-        )
+        # The extra POP input is a constant load patch, not a behavioral one.
+        kxPop pops.load {
+          load.inputs = {
+            POP = popflowInputs.POP;
+          };
+        }
       )
     );
   inherit (builtins) deepSeq mapAttrs tryEval;
 in
+# Evaluate both the convenience `outputs` view and the raw exporter surface.
 mapAttrs (_: x: tryEval (deepSeq x x)) {
 
   outputs = nixosModules.outputs { };

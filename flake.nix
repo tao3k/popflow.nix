@@ -1,34 +1,31 @@
 {
-  inputs = {
-    nixlib.url = "github:nix-community/nixpkgs.lib";
-    POP.url = "github:divnix/POP";
-    POP.inputs.nixlib.follows = "nixlib";
-    POP.inputs.nixpkgs.follows = "";
-    POP.inputs.flake-compat.follows = "";
-
-    yants.url = "github:divnix/yants/?ref=refs/pull/5/head";
-    yants.inputs.nixpkgs.follows = "nixlib";
-
-    haumea.url = "github:nix-community/haumea";
-    haumea.inputs.nixpkgs.follows = "nixlib";
-
-    dmerge.url = "github:divnix/dmerge";
-    dmerge.inputs.haumea.follows = "haumea";
-    dmerge.inputs.nixlib.follows = "nixlib";
-    dmerge.inputs.yants.follows = "yants";
-
-    call-flake.url = "github:divnix/call-flake";
-  };
   outputs =
-    { self, ... }@inputs:
+    _:
     let
-      lib = import ./src/__loader.nix self.inputs;
+      inputs = import ./.;
+      lib = import ./src/__loader.nix inputs;
+      examplesLib = lib // inputs.nixlib;
+      checkInputs = lib // {
+        inherit inputs;
+        popflowLib = inputs.nixlib // lib;
+        lib = inputs.nixlib // lib;
+      };
     in
+    /*
+      Assemble the public flake outputs from the plain imported popflow inputs.
+
+      Type: AttrSet
+    */
     {
       inherit lib;
+      popflow = inputs;
       examples = import ./examples/_loader.nix {
         inherit inputs;
-        lib = lib // inputs.nixlib.lib;
+        lib = examplesLib;
+      };
+      checks = inputs.namaka.lib.load {
+        src = ./tests;
+        inputs = checkInputs;
       };
     };
 }

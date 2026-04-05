@@ -3,27 +3,117 @@
 #+EMAIL: gtrunsec@hardenedlinux.org
 #+DATE: 2023-05-03 Wed 05:53
 
-powered by [[https://github.com/divnix/POP/blob/main/POP.md][POP: Pure Object Prototypes]] && [[https://github.com/nix-community/haumea][haumea]]
+powered by [[https://github.com/divnix/POP/blob/main/POP.md][POP: Pure Object Prototypes]] && [[https://github.com/NixOS/yants][yants]] && [[https://github.com/nix-community/haumea][haumea]]
 
  ~A nix language configuration framework based on POP: Pure Object~
 
-if you want to understand this repo how works and use cases easily, just read the tests and expressions directly. For having a human-readable test set, the problem of complexity wouldn't exist anymore.
+If you want to understand this repo and its use cases quickly, follow one
+stable reading path instead of jumping between directories.
 
-- snapshots : https://github.com/GTrunSec/flops/blob/master/tests/_snapshots/haumea
-- expr: https://github.com/GTrunSec/flops/blob/master/tests/haumea/expr.nix
+- docs index: [[./docs/index.md][docs/index.md]]
+- reading path: [[./docs/practice/reading-path.md][docs/practice/reading-path.md]]
+- yants contract manual: [[./docs/reference/yants-contracts.md][docs/reference/yants-contracts.md]]
+- internal algorithm map: [[./docs/reference/internal-algorithms.md][docs/reference/internal-algorithms.md]]
+- POP example: [[./examples/pop-vocabulary.nix][examples/pop-vocabulary.nix]]
+- yants example: [[./examples/yants-contracts.nix][examples/yants-contracts.nix]]
+- POP constructor test: [[./tests/popConstructors/expr.nix][tests/popConstructors/expr.nix]]
+- yants contract test: [[./tests/yantsContracts/expr.nix][tests/yantsContracts/expr.nix]]
+- yants contract note: [[./docs/practice/yants-contracts.md][docs/practice/yants-contracts.md]]
+- tests overview: [[./tests/README.md][tests/README.md]]
+- templates overview: [[./templates/README.md][templates/README.md]]
+- semantic test snapshots: [[./tests/_snapshots/][tests/_snapshots/]]
 
-* bye bye, a bloated flake inputs
+* Flake Input Workflow
 
-We could avoid putting all the inputs in the main flake.nix
+If you want the flake-specific entry first, stay on the same POP-first grammar
+used everywhere else in the repo:
 
-- use the ~flake.pops.default~ to load a subflake.
+1. start from ~popflow.lib.flake.pops.default~
+2. call ~withInitInputs~ on a path, lock fixture, or called flake
+3. optionally grow the workflow with ~addInputsExtender~ or ~addExporter~
+4. materialize the result with ~outputsForSystem~ or ~outputsForSystems~
 
 #+begin_src nix
-callInputs =
-  (flops.lib.flake.pops.default.setInitInputs ./lib/__lock)
-    .setSystem
+linuxOutputs =
+  (popflow.lib.flake.pops.default.withInitInputs ./lib/__lock)
+    .outputsForSystem
     "x86_64-linux";
 #+end_src
+
+The walkthrough note is
+[[./docs/practice/flake-input-workflow.md][docs/practice/flake-input-workflow.md]], the fuller example is
+[[./examples/flake-workflow.nix][examples/flake-workflow.nix]], and the semantic check is
+[[./tests/flake/expr.nix][tests/flake/expr.nix]].
+
+The public API is organized by domain:
+
+- ~popflow.lib.configs.pops~
+- ~popflow.lib.flake.pops~
+- ~popflow.lib.haumea.pops~
+
+The corresponding structural contracts live under ~*.contracts~ and are backed
+by ~yants~.
+
+* Downstream Quickstart
+
+For a downstream starting point, use the default template and keep the same
+grammar the docs teach:
+
+1. start from a public POP object such as ~popflow.lib.haumea.pops.default~
+2. configure one reusable workflow with ~withInitLoad~
+3. consume that workflow from your concrete outputs
+
+#+begin_src nix
+outputs = { nixpkgs, popflow, ... }:
+  let
+    loadModules = popflow.lib.haumea.pops.default.withInitLoad {
+      src = ./nixosModules;
+      type = "nixosModules";
+    };
+  in
+  {
+    eval = nixpkgs.lib.evalModules {
+      modules = [ loadModules.outputs.default.programs.git ];
+    };
+
+    nixos = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [ loadModules.outputs.default.programs.git ];
+    };
+  };
+#+end_src
+
+The compact starting point is [[./templates/default/flake.nix][templates/default/flake.nix]], and the
+directory guide is [[./templates/README.md][templates/README.md]]. The walkthrough note is
+[[./docs/practice/downstream-quickstart.md][docs/practice/downstream-quickstart.md]].
+
+* Examples
+
+The flake also exposes a curated ~examples~ surface for learning POP and the
+current project shape:
+
+- ~examples.pop~
+- ~examples.yants~
+- ~examples.configs~
+- ~examples.flake~
+- ~examples.haumea.data~
+- ~examples.haumea.modules~
+
+The directory-level guide lives in [[./examples/README.md][examples/README.md]].
+
+* Tests
+
+The tests are now part of the learning path as well as the validation path:
+
+- [[./tests/popConstructors/expr.nix][tests/popConstructors/expr.nix]] explains `pop`, `extendPop`, `kPop`, and `kxPop`
+- [[./tests/yantsContracts/expr.nix][tests/yantsContracts/expr.nix]] explains the `yants` contract layer and current runtime guards
+- [[./tests/configs/expr.nix][tests/configs/expr.nix]] explains the configs workflow semantics
+- [[./tests/flake/expr.nix][tests/flake/expr.nix]] explains the flake workflow semantics
+- [[./tests/haumeaData/expr.nix][tests/haumeaData/expr.nix]] explains plain Haumea data loading
+- [[./tests/haumeaNixOSModules/expr.nix][tests/haumeaNixOSModules/expr.nix]] explains the `nixosModules` loading experiment
+- [[./tests/evalModules/expr.nix][tests/evalModules/expr.nix]] explains the later `evalModules` path
+
+The directory-level guide lives in [[./tests/README.md][tests/README.md]].
 
 * Merge
 

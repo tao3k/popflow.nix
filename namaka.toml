@@ -3,7 +3,6 @@ cmd = [
   "nix",
   "flake",
   "check",
-  "./local",
   "--override-input",
   "namaka",
   "github:nix-community/namaka",
@@ -13,7 +12,7 @@ cmd = [
 cmd = [
   "nix",
   "eval",
-  "./local#checks",
+  "./#checks",
   "--override-input",
   "namaka",
   "github:nix-community/namaka",
