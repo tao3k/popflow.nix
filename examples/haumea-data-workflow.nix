@@ -38,10 +38,17 @@ let
           }
         )
       );
+
+  interfaceWorkflow = pops.default.withInitLoad {
+    src = ../tests/haumeaData/__interface;
+    transformer = [ lib.haumea.removeTopDefault ];
+  };
 in
 {
   inherit workflow;
 
   layouts = workflow.layouts;
   exports = workflow.exports;
+  interfaceLayouts = interfaceWorkflow.layouts.default;
+  topDefaultRemoved = !(interfaceWorkflow.layouts.default ? default);
 }

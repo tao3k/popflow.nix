@@ -7,6 +7,9 @@
 let
   types = root.haumea.types // yants;
   l = lib // builtins;
+  loadSrc =
+    with yants;
+    either path (either string (openStruct "srcAttrs" { outPath = either path string; }));
 
   enum' =
     o: e: v:
@@ -66,7 +69,7 @@ let
 
     # The plain load shape accepted by `initLoad` and load extenders.
     haumeaLoad = {
-      src = either path (either string (openStruct "srcAttrs" { outPath = either path string; }));
+      src = loadSrc;
       transformer = either function (list any);
       inputsTransformer = either function (list any);
       inputs = attrs any;
@@ -83,7 +86,9 @@ let
 
     # One plain attrset patch over the load surface.
     haumeaLoadExtender = {
-      load = structOption "haumea.load" structAttrs.haumeaLoad;
+      # `load` accepts either a full load patch or a source shorthand that
+      # will later normalize to `{ src = ...; }`.
+      load = option (either (structOption "haumea.load" structAttrs.haumeaLoad) loadSrc);
     };
 
     # One POP object that can contribute load initialization state.

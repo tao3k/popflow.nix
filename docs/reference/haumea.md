@@ -28,6 +28,7 @@ and to materialize either plain data layouts or module-aware outputs.
 - `lib.haumea.contracts`
 - `lib.haumea.moduleImporter`
 - `lib.haumea.moduleLayouts`
+- `lib.haumea.removeTopDefault`
 
 The contracts/type surface also exposes POP-first aliases such as `loadPop`,
 `exporterPop`, `defaultPop`, and `initLoadPop`, while retaining the older
@@ -112,6 +113,16 @@ the module-aware importer used when load type is `nixosModules`.
 Role:
 the layout adapter that turns loaded Haumea trees into module-oriented
 structures and extenders.
+
+### `lib.haumea.removeTopDefault`
+
+Role:
+the top-level transformer that hides a root `default.nix` leaf when that file
+exists only as the repository import interface.
+
+Use this when:
+you want Haumea to load sibling files under one directory, but do not want the
+top-level `default.nix` to appear as `default` in the resulting tree.
 
 ## Constructor And Method Grammar
 

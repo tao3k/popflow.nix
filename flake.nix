@@ -2,13 +2,10 @@
   outputs =
     _:
     let
-      inputs = import ./.;
-      lib = import ./src/__loader.nix inputs;
-      examplesLib = lib // inputs.nixlib;
-      checkInputs = lib // {
-        inherit inputs;
-        popflowLib = inputs.nixlib // lib;
-        lib = inputs.nixlib // lib;
+      popflow = import ./.;
+      checkContext = popflow // {
+        inputs = popflow;
+        popflowLib = popflow.lib;
       };
     in
     /*
@@ -17,15 +14,18 @@
       Type: AttrSet
     */
     {
-      inherit lib;
-      popflow = inputs;
+      inherit popflow;
+      inherit (popflow)
+        lib
+        popflowLib
+        ;
       examples = import ./examples/_loader.nix {
-        inherit inputs;
-        lib = examplesLib;
+        inputs = popflow;
+        lib = popflow.lib;
       };
-      checks = inputs.namaka.lib.load {
+      checks = popflow.namaka.lib.load {
         src = ./tests;
-        inputs = checkInputs;
+        inputs = checkContext;
       };
     };
 }

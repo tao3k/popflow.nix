@@ -7,7 +7,7 @@
 */
 { inputs, ... }:
 let
-  popflowLib = import ../src/__loader.nix inputs;
+  inherit (inputs) popflowLib;
   configsTypes = popflowLib.configs.contracts.types;
   flakeTypes = popflowLib.flake.contracts.types;
   haumeaTypes = popflowLib.haumea.types;
@@ -50,6 +50,7 @@ in
     haumea = {
       defaultPopAcceptsDefaultObject = trySuccess (haumeaTypes.defaultPop popflowLib.haumea.pops.default);
       loadExtenderAcceptsStructuredPatch = trySuccess (haumeaTypes.loadExtender validLoadExtender);
+      loadExtenderAcceptsSourceShorthand = trySuccess (haumeaTypes.loadExtender { load = "fixtures"; });
       invalidLoadExtenderRejected =
         !(trySuccess (haumeaTypes.loadExtender (validLoadExtender // { load.type = "oops"; })));
     };
@@ -71,6 +72,9 @@ in
     haumea = {
       addLoadExtenderAcceptsStructuredPatch = trySuccess (
         popflowLib.haumea.pops.default.addLoadExtender validLoadExtender
+      );
+      addLoadExtenderAcceptsSourceShorthand = trySuccess (
+        popflowLib.haumea.pops.default.addLoadExtender { load = "fixtures"; }
       );
       addLoadExtenderRejectsInvalidType =
         !(trySuccess (

@@ -114,6 +114,13 @@
           };
         };
       };
+      interfaceDefaultRemoved = {
+        nested = {
+          interface = {
+            keepsDefaultHidden = true;
+          };
+        };
+      };
     };
   };
 }

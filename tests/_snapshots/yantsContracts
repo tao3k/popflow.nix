@@ -19,6 +19,7 @@
     haumea = {
       defaultPopAcceptsDefaultObject = true;
       invalidLoadExtenderRejected = true;
+      loadExtenderAcceptsSourceShorthand = true;
       loadExtenderAcceptsStructuredPatch = true;
     };
   };
@@ -31,6 +32,7 @@
       addInputsExtenderRejectsWrongShape = true;
     };
     haumea = {
+      addLoadExtenderAcceptsSourceShorthand = true;
       addLoadExtenderAcceptsStructuredPatch = true;
       addLoadExtenderRejectsInvalidType = true;
     };

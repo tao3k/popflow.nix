@@ -10,7 +10,7 @@ let
   popflowInputs = import ../..;
   inherit (popflowInputs) POP dmerge;
   inherit (POP) kxPop;
-  popflowLib = import ../../src/__loader.nix popflowInputs;
+  inherit (popflowInputs) popflowLib;
   inherit (popflowLib.haumea) pops;
 
   # Start from the repository root with the lib expected by the module importer.

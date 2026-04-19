@@ -13,7 +13,7 @@ with popflowInputs.haumea.lib;
 let
   inherit (popflowInputs) POP dmerge;
   inherit (POP) extendPop kxPop;
-  popflowLib = import ../../src/__loader.nix popflowInputs;
+  inherit (popflowInputs) popflowLib;
   inherit (popflowLib.haumea) pops;
 
   # Start from the default Haumea POP object and opt into lifted default.nix data files.
@@ -35,7 +35,7 @@ let
 
   # Load the fixture tree and expose one custom export built through `outputs`.
   dataFixtureLoad =
-    ((dataLoadWithDmerge.addLoadExtender { load.src = ./__data; }).addLoadExtender (
+    ((dataLoadWithDmerge.addLoadExtender { load = ./__data; }).addLoadExtender (
       # This extender is a pure constant patch, so `kxPop` is the lighter POP fit.
       kxPop pops.load { load.loader = [ (matchers.nix loaders.scoped) ]; }
     )).addExporters
@@ -51,6 +51,13 @@ let
           }
         ))
       ];
+
+  # Treat the root `default.nix` as the import interface and hide it from the
+  # loaded data surface.
+  interfaceLoad = pops.default.withInitLoad {
+    src = ./__interface;
+    transformer = [ popflowLib.haumea.removeTopDefault ];
+  };
 
   inherit (builtins) deepSeq mapAttrs tryEval;
 in
@@ -74,6 +81,7 @@ mapAttrs (_: x: tryEval (deepSeq x x)) {
         };
       }
     );
+    interfaceDefaultRemoved = interfaceLoad.outputs { };
   };
   exports = dataFixtureLoad.exports;
 }

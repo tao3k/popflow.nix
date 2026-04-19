@@ -10,7 +10,7 @@ let
   popflowInputs = import ../..;
   inherit (popflowInputs) POP dmerge nixlib;
   inherit (POP) extendPop;
-  popflowLib = import ../../src/__loader.nix popflowInputs;
+  inherit (popflowInputs) popflowLib;
   inherit (popflowLib.haumea) pops;
   inherit (nixlib) evalModules;
 

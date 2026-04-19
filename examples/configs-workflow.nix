@@ -7,7 +7,7 @@
 { inputs, ... }:
 let
   inherit (inputs.POP) extendPop;
-  popflowLib = import ../src/__loader.nix inputs;
+  inherit (inputs) popflowLib;
   pops = popflowLib.configs.pops;
 
   seed = pops.default.withInitRecipes {

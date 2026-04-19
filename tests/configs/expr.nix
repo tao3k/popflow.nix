@@ -8,7 +8,7 @@ _:
 let
   popflowInputs = import ../..;
   inherit (popflowInputs) POP;
-  popflowLib = import ../../src/__loader.nix popflowInputs;
+  inherit (popflowInputs) popflowLib;
   pops = popflowLib.configs.pops;
 
   workflow =

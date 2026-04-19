@@ -30,20 +30,54 @@ let
   ];
 in
 rec {
+  /*
+    Normalize a load patch so extenders may use `load = ./path` shorthand when
+    they only want to replace the source tree.
+
+    Type: Path | String | AttrSet -> AttrSet
+  */
+  normalizeLoadPatch =
+    load:
+    let
+      isLoadAttrSet =
+        l.isAttrs load
+        && (
+          load ? src
+          || load ? transformer
+          || load ? inputsTransformer
+          || load ? inputs
+          || load ? loader
+          || load ? type
+          || load ? nixosModuleImporter
+        );
+      isLoadSourceShorthand =
+        l.typeOf load == "path" || l.isString load || (l.isAttrs load && !isLoadAttrSet && load ? outPath);
+    in
+    if isLoadSourceShorthand then { src = load; } else load;
+
   # Normalize one load config into the shape the later exporter/layout phases expect.
-  normalizeLoadConfig = load: currentLoad: {
-    inherit (load)
-      loader
-      transformer
-      type
-      inputsTransformer
-      nixosModuleImporter
-      ;
-    src = if l.isString load.src then l.unsafeDiscardStringContext load.src else load.src;
-    inputs = lib.pipe load.inputs (
-      load.inputsTransformer ++ [ (x: x // { loadSrc = currentLoad.src; }) ]
-    );
-  };
+  normalizeLoadConfig =
+    load: currentLoad:
+    let
+      normalizedLoad = normalizeLoadPatch load;
+    in
+    {
+      inherit (normalizedLoad)
+        loader
+        transformer
+        type
+        inputsTransformer
+        nixosModuleImporter
+        ;
+      src =
+        if l.isString normalizedLoad.src then
+          l.unsafeDiscardStringContext normalizedLoad.src
+        else
+          normalizedLoad.src;
+      inputs = lib.pipe normalizedLoad.inputs (
+        normalizedLoad.inputsTransformer ++ [ (x: x // { loadSrc = currentLoad.src; }) ]
+      );
+    };
 
   # Accept either a plain load extender patch or a POP object with `withInitLoad`.
   applyLoadExtender =
@@ -55,7 +89,7 @@ rec {
     foldl' (
       acc: extender:
       let
-        extenderConfig = (applyLoadExtender initLoad extender).load or { };
+        extenderConfig = normalizeLoadPatch ((applyLoadExtender initLoad extender).load or { });
       in
       l.recursiveMerge' [
         acc
