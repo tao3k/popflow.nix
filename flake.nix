@@ -19,7 +19,7 @@
         lib
         popflowLib
         ;
-      examples = import ./examples/_loader.nix {
+      examples = import ./examples {
         inputs = popflow;
         lib = popflow.lib;
       };

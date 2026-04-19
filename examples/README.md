@@ -35,7 +35,7 @@ Those examples are also exported through the flake `examples` output:
 
 ## Support Files
 
-- `_loader.nix`: explicit assembly of the public example surface
+- `default.nix`: explicit assembly of the public example surface
 - `__nixpkgsFlake/`: pinned fixture flake used by the flake examples and tests
 
 ## Continue Reading

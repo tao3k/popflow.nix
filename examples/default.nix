@@ -1,7 +1,7 @@
 /*
-  Assemble a curated example surface for POP learning and the three main popflow
-  domains. The public examples are explicit on purpose so the learning path is
-  stable and does not depend on whatever files happen to exist in this
+  Assemble a curated example surface for POP learning and the three main
+  popflow domains. The public examples are explicit on purpose so the learning
+  path is stable and does not depend on whatever files happen to exist in this
   directory.
 
   Type: { inputs = AttrSet; lib = AttrSet; } -> AttrSet

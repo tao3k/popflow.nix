@@ -1,64 +1,69 @@
 let
-  inputs = import ./nix/tamal { };
-  callFlake = import inputs.call-flake;
+  sources = import ./nix/tamal { };
+  callFlake = import sources.call-flake;
 
   /*
     Call a pinned flake source directly from the Nixtamal materialized inputs.
 
     Type: Path -> AttrSet -> AttrSet
   */
-  callPinnedFlake = input: args: (import (input + "/flake.nix")).outputs args;
+  callPinnedFlake = source: args: (import (source + "/flake.nix")).outputs args;
 in
 /*
-  Materialize the repository's pinned external dependencies as plain Nix
-  values. This is the non-flake entrypoint the rest of the codebase imports.
+  Materialize the repository in two layers:
+  - `sources`: raw Nixtamal-pinned source trees
+  - `inputs`: plain imported dependency values built from those sources
 
   Type: AttrSet
 */
 rec {
-  inherit inputs;
-  call-flake = callFlake;
+  inherit sources;
 
-  nixlib = (callFlake inputs.nixlib).lib;
+  inputs = rec {
+    call-flake = callFlake;
 
-  haumea = {
-    lib = import inputs.haumea { lib = nixlib; };
+    nixlib = (callFlake sources.nixlib).lib;
+
+    haumea = {
+      lib = import sources.haumea { lib = nixlib; };
+    };
+
+    yants = callPinnedFlake sources.yants { nixpkgs.lib = nixlib; };
+
+    namaka = callPinnedFlake sources.namaka {
+      self = null;
+      nixpkgs.lib = nixlib;
+      inherit haumea;
+    };
+
+    dmerge = callPinnedFlake sources.dmerge {
+      self = null;
+      inherit
+        haumea
+        yants
+        ;
+      nixlib.lib = nixlib;
+    };
+
+    POP = import (sources.POP + "/POP.nix") { lib = nixlib; };
   };
 
-  yants = callPinnedFlake inputs.yants { nixpkgs.lib = nixlib; };
-
-  namaka = callPinnedFlake inputs.namaka {
-    self = null;
-    nixpkgs.lib = nixlib;
-    inherit haumea;
-  };
-
-  dmerge = callPinnedFlake inputs.dmerge {
-    self = null;
-    inherit
-      haumea
-      yants
-      ;
-    nixlib.lib = nixlib;
-  };
-
-  POP = import (inputs.POP + "/POP.nix") { lib = nixlib; };
+  inherit (inputs)
+    POP
+    dmerge
+    haumea
+    namaka
+    nixlib
+    yants
+    ;
+  call-flake = inputs.call-flake;
 
   /*
     Public popflow library layered on top of raw `nixpkgs.lib`.
 
     Type: AttrSet
   */
-  popflowLib = import ./src/__loader.nix {
-    call-flake = callFlake;
-    inherit
-      POP
-      dmerge
-      haumea
-      nixlib
-      yants
-      ;
-  };
+  popflowLib = import ./src inputs;
 
   # Keep `nixlib` explicit for callers that need upstream `nixpkgs.lib`.
   lib = popflowLib;
